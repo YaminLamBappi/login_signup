@@ -1,10 +1,11 @@
 <?php 
 include("db.php");
+include 'login_require_session.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get the values from the form
-    $name = $_POST['productName'];
+
+    $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
     try {
@@ -34,15 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $productId; ?>" method="post">
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($product['name']); ?>" required>
+                <input type="text" class="form-control" name="name" value="<?php echo $product['name']; ?>" required>
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea class="form-control" name="description" rows="3" required><?php echo htmlspecialchars($product['description']); ?></textarea>
+                <textarea class="form-control" name="description" rows="3" required><?php echo $product['description']; ?></textarea>
             </div>
             <div class="form-group">
                 <label for="price">Price:</label>
-                <input type="number" class="form-control" name="price" value="<?php echo htmlspecialchars($product['price']); ?>" step="0.01" required>
+                <input type="number" class="form-control" name="price" value="<?php echo $product['price']; ?>" step="0.01" required>
             </div>
             <button type="submit" class="btn btn-primary">Add Product</button>
             <a href="index.php" class="btn btn-secondary ml-2">Cancel</a>

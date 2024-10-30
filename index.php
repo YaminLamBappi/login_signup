@@ -2,18 +2,17 @@
 
 include("db.php");
 
-session_start();
-if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
-    exit();
-}
+include 'login_require_session.php';
+
 
 $username = $_SESSION['username'];
 
-$productstmt = $conn->prepare('select * from Product');
+$productstmt = $conn->prepare("SELECT * FROM Product");
 $productstmt->execute();
 
 $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 ?>
 
@@ -44,13 +43,16 @@ $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
                 <?php foreach ($products as $product): ?>
                 <tr>
-                    <th scope="row"><?php echo htmlspecialchars($product['id']); ?></th>
-                    <td><?php echo htmlspecialchars($product['name']); ?></td>
-                    <td><?php echo htmlspecialchars($product['description']); ?></td>
-                    <td><?php echo htmlspecialchars($product['price']); ?></td>
+                    <th scope="row"><?php echo $product['id']; ?></th>
+                    <td><?php echo $product['name']; ?></td>
+                    <td><?php echo $product['description']; ?></td>
+                    <td>$<?php echo $product['price']; ?></td>
                     <td>
-                        <a href="update_product.php?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="delete_product.php?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-danger">Delete</a>
+                        <a href= "update_product.php?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-primary">Update</a>
+
+                        <form action="delete_product.php?id=<?php echo $product['id']; ?>" method="post" style="display:inline;">
+                                <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete(this); return false;">Delete</a>
+                        </form>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -62,9 +64,18 @@ $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
     </div>
+    
+    <script>
+function confirmDelete(link) {
+    if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+        link.parentElement.submit(); // Submit the form if confirmed
+    }
+}
+</script>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9WXhUptEr8+/2Q0E7rQZq5h5WhiZ/A15Lz9A2" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
+
 </html>

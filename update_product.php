@@ -2,10 +2,8 @@
 session_start();
 include 'db.php'; 
 
-if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
-    exit();
-}
+include 'login_require_session.php';
+
 
 if (isset($_GET['id'])) {
     $productId = $_GET['id'];

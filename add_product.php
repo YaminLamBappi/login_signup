@@ -3,21 +3,52 @@ include("db.php");
 include 'login_require_session.php';
 
 
+$successMsg = "";
+
+
+$nameErr  = $descriptionErr = $priceErr =  "";
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
-    try {
 
+
+    $valid = true;
+
+
+    if (empty($_POST["name"])) {
+        $nameErr = "Product name is required";
+        $valid = false;
+      } 
+    
+    if (empty($_POST["description"])) {
+        $descriptionErr = "Please provide product description.";
+        $valid = false;
+
+      }
+
+      if (empty($_POST["price"])) {
+        $priceErr = "Please provide product price.";
+        $valid = false;
+      }
+
+
+
+if($valid){
+    try {
         $sql = "INSERT INTO Product (name, description, price)
         VALUES ('$name', '$description', '$price')";
         $conn->exec($sql);
+        $_SESSION['successMsg'] = "Product Successfully Added!";
         header("Location: index.php");
       } catch(PDOException $e) {
         echo $sql . "<br>" . $e->getMessage();
       }
       
+}
       $conn = null;
 }
 
@@ -35,15 +66,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="<?php echo $_SERVER['PHP_SELF'] . '?id=' . $productId; ?>" method="post">
             <div class="form-group">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" name="name" value="<?php echo $product['name']; ?>" required>
+                <input type="text" class="form-control" name="name" value="<?= $name; ?>" >
+                <span class="text-danger"><?php echo $nameErr;?></span>
+
             </div>
             <div class="form-group">
                 <label for="description">Description:</label>
-                <textarea class="form-control" name="description" rows="3" required><?php echo $product['description']; ?></textarea>
+                <textarea class="form-control" name="description" rows="3"><?= $description; ?></textarea>
+                <span class="text-danger"><?php echo $descriptionErr;?></span>
+
             </div>
             <div class="form-group">
                 <label for="price">Price:</label>
-                <input type="number" class="form-control" name="price" value="<?php echo $product['price']; ?>" step="0.01" required>
+                <input type="number" class="form-control" name="price" value="<?= $price ?>" step="0.01">
+                <span class="text-danger"><?php echo $priceErr;?></span>
+
             </div>
             <button type="submit" class="btn btn-primary">Add Product</button>
             <a href="index.php" class="btn btn-secondary ml-2">Cancel</a>

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $emailErr = "Email is required";
       } 
     
-      if (empty($_POST["password"])) {
+    if (empty($_POST["password"])) {
         $passwordErr = "Password is required";
       } 
 
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $wronginput = "Email is Incorrect.";
             }
         } else {
-        $noUser = "Email Is Incorrect.";
+        $noUser = "No User Found.";
     }
 }
 ?>

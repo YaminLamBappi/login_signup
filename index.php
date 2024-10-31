@@ -3,15 +3,19 @@
 include("db.php");
 
 include 'login_require_session.php';
+include 'session.php';
 
-
-$username = $_SESSION['username'];
+$username = $_SESSION['email'];
 
 $productstmt = $conn->prepare("SELECT * FROM Product");
 $productstmt->execute();
 
 $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
 
+if (isset($_SESSION['successMsg'])) {
+    echo "<div class='alert alert-success'>" . $_SESSION['successMsg'] . "</div>";
+    unset($_SESSION['successMsg']); // Clear the message after displaying
+}
 
 
 ?>
@@ -26,9 +30,11 @@ $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="text-center">Welcome to the home page, <?php echo $_SESSION['username']; ?>!</h2>
+        <h2 class="text-center">Welcome to the home page, <?php echo $_SESSION['email']; ?>!</h2>
         
         <h4 class="mt-4">All available products:</h4>
+
+
         
         <table class="table table-bordered mt-3">
             <thead class="thead-light">
@@ -44,8 +50,9 @@ $products = $productstmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php foreach ($products as $product): ?>
                 <tr>
                     <th scope="row"><?php echo $product['id']; ?></th>
-                    <td><?php echo $product['name']; ?></td>
-                    <td><?php echo $product['description']; ?></td>
+                    <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;"><?php echo $product['name']; ?></td>
+                    <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 150px;">
+                        <?php echo $product['description']; ?> </td>
                     <td>$<?php echo $product['price']; ?></td>
                     <td>
                         <a href= "update_product.php?id=<?php echo $product['id']; ?>" class="btn btn-sm btn-primary">Update</a>

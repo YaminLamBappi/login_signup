@@ -2,31 +2,46 @@
 session_start();
 include 'db.php'; 
 
-
-if(isset($_SESSION['username'])){
+if(isset($_SESSION['email'])){
     header('Location:index.php');
     exit();
 }
 
+ $emailErr  = $passwordErr = $wronginput = $noUser =  "";
+
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    if (empty($_POST["email"])) {
+        $emailErr = "Email is required";
+      } 
+    
+      if (empty($_POST["password"])) {
+        $passwordErr = "Password is required";
+      } 
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    // print_r($email);exit();
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC); 
 
     if ($user) {
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['username'] = $user['username'];
-            header('Location: index.php');
-            exit();
+        if($email == $user['email']) {
+            if(password_verify($password, $user['password'])){
+                $_SESSION['email'] = $user['email'];
+                header('Location: index.php');
+            } else {
+                $wrongPass = "Password is Incorrect.";
+                } 
+
+            } else {
+                $wronginput = "Email is Incorrect.";
+            }
         } else {
-            echo "Invalid username or password!";
-        }
-    } else {
-        echo "Invalid username or password!";
+        $noUser = "Email Is Incorrect.";
     }
 }
 ?>
@@ -45,15 +60,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-6">
                 <h2 class="text-center mb-4">Login</h2>
                 
+                <span class="error"><?php echo $wronginput;?></span>
+                
+
                 <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                        <label for="email">Email</label>
+                        <input type="text" name="email" class="form-control" value="<?= $email ?>" placeholder="Enter email" >
+                        
+                        <span class="text-danger" >
+                            <?php 
+                            if (!empty($emailErr)) {
+                                echo $emailErr;
+                            } elseif (!empty($noUser)) {
+                                echo $noUser;
+                            }
+                            ?>
+                        </span>
+
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Enter password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password" >
+                        
+                        <span class="text-danger" >
+                            <?php 
+                            if (!empty($passwordErr)) {
+                                echo $passwordErr;
+                            } elseif (!empty($wrongPass)) {
+                                echo $wrongPass;
+                            }
+                            ?>
+                        </span>
+
                     </div>
+
+
                     <button type="submit" class="btn btn-primary btn-block">Sign in</button>
                 </form>
 

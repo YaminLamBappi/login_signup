@@ -3,29 +3,62 @@ session_start();
 
 include 'db.php'; 
 
-if(isset($_SESSION['username'])){
+if (isset($_SESSION['email'])) {
     header('Location:index.php');
     exit();
 }
-
+$nameErr = $emailErr = $passwordErr = $confirmPasswordErr = $username =  "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); 
+    // Initialize validation flags
+    $valid = true;
 
-    try {
+    if (empty($_POST["username"])) {
+        $nameErr = "Username is required";
+        $valid = false;
+    } else {
+        $username = $_POST['username'];
+    }
 
-        $sql = "INSERT INTO users (username, email, password)
-        VALUES ('$username', '$email', '$password')";
-        $conn->exec($sql);
-        header("Location: login.php");
-      } catch(PDOException $e) {
-        echo $sql . "<br>" . $e->getMessage();
-      }
-      
-      $conn = null;
+    if (empty($_POST["email"])) {
+        $emailErr = "Email is required";
+        $valid = false;
+    } else {
+        $email = $_POST['email'];
+    }
+
+    if (empty($_POST["password"])) {
+        $passwordErr = "Password is required";
+        $valid = false;
+    } else {
+        $password = $_POST['password'];
+    }
+
+    if (empty($_POST["confirm_password"])) {
+        $confirmPasswordErr = "Confirm password is required";
+        $valid = false;
+    } elseif ($_POST["password"] !== $_POST["confirm_password"]) {
+        $confirmPasswordErr = "Passwords do not match";
+        $valid = false;
+    }
+
+    if ($valid) {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            $sql = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+            $conn->exec($sql);
+
+            header("Location: login.php");
+            exit();
+
+        } catch (PDOException $e) {
+            echo $sql . "<br>" . $e->getMessage();
+        }
+
+        $conn = null;
+    }
 }
 ?>
 
@@ -46,15 +79,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" name="username" class="form-control" placeholder="Username" required>
+                        <input type="text" name="username" class="form-control" value="<?= $username ?>" placeholder="Your Username">
+                        <span class="text-danger"><?php echo $nameErr;?></span>
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input type="email" name="email" class="form-control" value="<?= $email ?>" placeholder="Enter Email">
+                        <span class="text-danger"><?php echo $emailErr;?></span>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Password">
+                        <span class="text-danger"><?php echo $passwordErr;?></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password">
+                        <span class="text-danger"><?php echo $confirmPasswordErr;?></span>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Register</button>
                 </form>

@@ -22,6 +22,8 @@ if (isset($_GET['id'])) {
     exit();
 }
 
+$successMsg = "";
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $description = $_POST['description'];
@@ -30,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $updateStmt = $conn->prepare("UPDATE Product SET name = ?, description = ?, price = ? WHERE id = ?");
     if ($updateStmt->execute([$name, $description, $price, $productId])) {
+        $_SESSION['successMsg'] = "Product Successfully Updated!";
         header('Location: index.php'); 
     } else {
         echo "Failed to update the product.";

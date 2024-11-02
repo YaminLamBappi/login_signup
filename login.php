@@ -3,7 +3,7 @@ session_start();
 include 'db.php'; 
 
 if(isset($_SESSION['email'])){
-    header('Location:index.php');
+    header('Location:admin_portal.php');
     exit();
 }
 
@@ -32,7 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if($email == $user['email']) {
             if(password_verify($password, $user['password'])){
                 $_SESSION['email'] = $user['email'];
-                header('Location: index.php');
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['role'] = $user['role'];
+    
+                // Redirect based on role
+                if ($user['role'] === 'admin') {
+                    header("Location: admin_portal.php");
+                } else {
+                    header("Location: employee_portal.php");
+                }
+                exit();
             } else {
                 $wrongPass = "Password is Incorrect.";
                 } 
@@ -45,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,9 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit" class="btn btn-primary btn-block">Sign in</button>
                 </form>
 
-                <div class="text-center mt-3">
-                    <a href="register.php" class="btn btn-link">Register</a>
-                </div>
             </div>
         </div>
     </div>

@@ -21,4 +21,4 @@ This project is a web-based Employee Leave Management System developed using PHP
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/leave-management-system.git
+   git clone https://github.com/YaminLamBappi/login_signup

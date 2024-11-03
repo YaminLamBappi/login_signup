@@ -12,7 +12,7 @@ $leave_from = $leave_to = $reason = "";
 $leaveErr = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Validate input
+
     if (empty($_POST["leave_from"]) || empty($_POST["leave_to"])) {
         $leaveErr = "Both dates are required.";
     } else {
@@ -20,8 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $leave_to = $_POST['leave_to'];
         $reason = $_POST['reason'];
 
-        // Insert leave request into the database
-        // Insert leave request into the leave_histories table instead of leave_applications
         try {
             $stmt = $conn->prepare("INSERT INTO leave_histories (user_id, leave_from, leave_to, reason, status) VALUES (?, ?, ?, ?, 'pending')");
             $stmt->execute([$_SESSION['user_id'], $leave_from, $leave_to, $reason]);

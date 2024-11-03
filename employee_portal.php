@@ -9,7 +9,7 @@ $username = $_SESSION['email'];
 
 if (isset($_SESSION['successMsg'])) {
     echo "<div class='alert alert-success'>" . $_SESSION['successMsg'] . "</div>";
-    unset($_SESSION['successMsg']); // Clear the message after displaying
+    unset($_SESSION['successMsg']); 
 }
 ?>
 
@@ -29,7 +29,7 @@ if (isset($_SESSION['successMsg'])) {
         
         <div class="mt-3">
             <a href="apply_leave.php" class="btn btn-success">Apply For Leave.</a> 
-            <a href="leave_history.php" class="btn btn-success">Leave Applications.</a>
+            <a href="leave_history.php" class="btn btn-success">Leave Applications History.</a>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
     </div>

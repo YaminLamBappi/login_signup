@@ -6,23 +6,32 @@ include 'session.php';
 $username = $_SESSION['email'];
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header("Location: employee_portal.php"); // Redirect to the login page
+    header("Location: employee_portal.php");
     exit();
 }
 
-
-
-// Fetch leave requests
 try {
     $stmt = $conn->prepare("SELECT history_id, leave_from, leave_to, reason, status, u.username 
                              FROM leave_histories lh 
                              JOIN users u ON lh.user_id = u.id 
-                             WHERE status = 'pending'"); // Only fetch pending requests
+                             WHERE status = 'pending'");
     $stmt->execute();
     $leave_requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo "Error fetching leave requests: " . $e->getMessage();
     $leave_requests = [];
+}
+
+try {
+    $stmt = $conn->prepare("SELECT history_id, leave_from, leave_to, reason, status, request_date, u.username 
+                            FROM leave_histories lh 
+                            JOIN users u ON lh.user_id = u.id
+                            WHERE status = 'rejected' OR status = 'accepted'");
+    $stmt->execute();
+    $all_leave_requests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error fetching leave requests: " . $e->getMessage();
+    $all_leave_requests = [];
 }
 
 
@@ -78,7 +87,31 @@ try {
             </tbody>
         </table>
         <?php endif; ?>
-        
+        <h2>Leave History</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Leave From</th>
+                    <th>Leave To</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Request Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($all_leave_requests as $record): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($record['username']); ?></td>
+                        <td><?= htmlspecialchars($record['leave_from']); ?></td>
+                        <td><?= htmlspecialchars($record['leave_to']); ?></td>
+                        <td><?= htmlspecialchars($record['reason']); ?></td>
+                        <td><?= htmlspecialchars(ucfirst($record['status'])); ?></td>
+                        <td><?= htmlspecialchars($record['request_date']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
         <div class="mt-3">
             <a href="add_employee.php" class="btn btn-success">Add New Employee</a>
             <a href="logout.php" class="btn btn-secondary">Logout</a>

@@ -62,7 +62,6 @@ try {
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Username</th>
                     <th>Leave From</th>
                     <th>Leave UpTo</th>
@@ -73,7 +72,6 @@ try {
             <tbody>
                 <?php foreach ($leave_requests as $request): ?>
                     <tr>
-                        <td><?= htmlspecialchars($request['history_id']); ?></td>
                         <td><?= htmlspecialchars($request['username']); ?></td>
                         <td><?= htmlspecialchars($request['leave_from']); ?></td>
                         <td><?= htmlspecialchars($request['leave_to']); ?></td>

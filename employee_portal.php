@@ -11,6 +11,12 @@ if (isset($_SESSION['successMsg'])) {
     echo "<div class='alert alert-success'>" . $_SESSION['successMsg'] . "</div>";
     unset($_SESSION['successMsg']); 
 }
+
+$stmt = $conn->prepare("SELECT leave_from, leave_to, reason, status, request_date FROM leave_histories WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$leave_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -25,13 +31,36 @@ if (isset($_SESSION['successMsg'])) {
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Welcome to the Employee page.</h2>
-                
+
+        <h2>Your Leave History</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Leave From</th>
+                    <th>Leave To</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Request Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($leave_history as $record): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($record['leave_from']); ?></td>
+                        <td><?= htmlspecialchars($record['leave_to']); ?></td>
+                        <td><?= htmlspecialchars($record['reason']); ?></td>
+                        <td><?= htmlspecialchars(ucfirst($record['status'])); ?></td>
+                        <td><?= htmlspecialchars($record['request_date']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
         
         <div class="mt-3">
             <a href="apply_leave.php" class="btn btn-success">Apply For Leave.</a> 
-            <a href="leave_history.php" class="btn btn-success">Leave Applications History.</a>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
+
     </div>
     
     <script>

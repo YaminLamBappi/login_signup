@@ -50,7 +50,9 @@ try {
 <body>
     <div class="container mt-5">
         <h2 class="text-center">Welcome to the Admin page!</h2>
-        
+        <div class="mt-3">
+            <a href="add_employee.php" class="btn btn-success">Add New Employee</a>
+        </div>
 
         <h4 class="mt-4">Manage Leave application:</h4>
         
@@ -111,7 +113,6 @@ try {
             </tbody>
         </table>
         <div class="mt-3">
-            <a href="add_employee.php" class="btn btn-success">Add New Employee</a>
             <a href="logout.php" class="btn btn-secondary">Logout</a>
         </div>
     </div>

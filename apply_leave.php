@@ -13,25 +13,41 @@ $leaveErr = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    if (empty($_POST["leave_from"]) || empty($_POST["leave_to"])) {
-        $leaveErr = "Both dates are required.";
+    $valid = true;
+
+    if (empty($_POST["leave_from"])) {
+        $leave_from_Err = "Enter dates leave from.";
+        $valid = false;
     } else {
         $leave_from = $_POST['leave_from'];
+        
+    }
+    if (empty($_POST['leave_to']) ){
+        $leaveErr = 'Enter dates leave upto.';
+        $valid = false;
+    } else{
         $leave_to = $_POST['leave_to'];
         $reason = $_POST['reason'];
+    }
+    if (empty($_POST['reason']) ){
+        $reasonErr = 'Reason are required.';
+        $valid = false;
+    } else{
+        $reason = $_POST['reason'];
+    }
 
-        try {
-            $stmt = $conn->prepare("INSERT INTO leave_histories (user_id, leave_from, leave_to, reason, status) VALUES (?, ?, ?, ?, 'pending')");
-            $stmt->execute([$_SESSION['user_id'], $leave_from, $leave_to, $reason]);
-           
-            $_SESSION['successMsg'] = " <h5>Leave Request Submitted Successfully!</h5>
-        <p>Your leave request has been submitted and is awaiting approval.</p>";
-            header("Location: employee_portal.php");
-            exit();
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-
+    if ($valid) {
+    try {
+        $stmt = $conn->prepare("INSERT INTO leave_histories (user_id, leave_from, leave_to, reason, status) VALUES (?, ?, ?, ?, 'pending')");
+        $stmt->execute([$_SESSION['user_id'], $leave_from, $leave_to, $reason]);
+       
+        $_SESSION['successMsg'] = " <h5>Leave Request Submitted Successfully!</h5>
+    <p>Your leave request has been submitted and is awaiting approval.</p>";
+        header("Location: employee_portal.php");
+        exit();
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
     }
 }
 
@@ -52,17 +68,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
             <div class="form-group">
                 <label for="leave_from">Leave From</label>
-                <input type="date" name="leave_from" class="form-control" value="<?= htmlspecialchars($leave_from); ?>" required>
-            </div>
+                <input type="date" name="leave_from" class="form-control" value="<?= $leave_from; ?>">
+                <span class="text-danger"><?php echo $leave_from_Err;?></span>
+                </div>
             <div class="form-group">
                 <label for="leave_to">Leave To</label>
-                <input type="date" name="leave_to" class="form-control" value="<?= htmlspecialchars($leave_to); ?>" required>
+                <input type="date" name="leave_to" class="form-control" value="<?= $leave_to; ?>">
+                <span class="text-danger"><?php echo $leaveErr;?></span>
+
             </div>
             <div class="form-group">
                 <label for="reason">Reason</label>
-                <textarea name="reason" class="form-control" rows="3"><?= htmlspecialchars($reason); ?></textarea>
+                <textarea name="reason" class="form-control" rows="3"><?= $reason; ?></textarea>
+                <span class="text-danger"><?php echo $reasonErr;?></span>
+
             </div>
-            <span class="text-danger"><?php echo $leaveErr; ?></span>
             <button type="submit" class="btn btn-primary">Submit Leave Request</button>
         </form>
         <a href="employee_portal.php" class="btn btn-secondary mt-3">Back to Portal</a>
